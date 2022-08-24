@@ -1,0 +1,26 @@
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<testbed name="xxx测试床" desc="xxx测试">
+    <env desc="集群-1">
+        <nodes>
+          <node ip="192.168.50.51" port="22" user="root" password="abc@123" />
+          <node ip="192.168.50.52" port="22" user="root" password="abc@123" />
+          <node ip="192.168.50.53" port="22" user="root" password="abc@123" />
+          <node ip="192.168.50.54" port="22" user="root" password="abc@123" />
+       </nodes>
+        <endpoint>192.168.50.51:6600</endpoint>
+        <web_url>https://192.168.50.54</web_url>
+        <params>
+            <endpoint_https>False</endpoint_https>
+        </params>
+    </env>
+    <env desc="集群-2">
+        <nodes>
+          <node ip="192.168.50.51" port="22" user="root" password="abc@123" />
+          <node ip="192.168.50.52" port="22" user="root" password="abc@123" />
+          <node ip="192.168.50.53" port="22" user="root" password="abc@123" />
+          <node ip="192.168.50.54" port="22" user="root" password="abc@123" />
+       </nodes>
+        <endpoint https="False">192.168.50.51:6600</endpoint>
+        <web_url>https://192.168.50.54</web_url>
+    </env>
+</testbed>

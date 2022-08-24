@@ -1,0 +1,5 @@
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<testconf desc="CI">
+    <testbed>conf/testbed/testbed_demo.xml</testbed>
+    <testset>conf/testset/testset_demo.xml</testset>
+</testconf>
