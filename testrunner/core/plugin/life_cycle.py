@@ -3,7 +3,7 @@
 """
 @author:TXU
 @file:life_cycle.py
-@time:19:48
+@time:2022/11/14
 @email:tao.xu2008@outlook.com
 @description: plugin load and destroy
 """

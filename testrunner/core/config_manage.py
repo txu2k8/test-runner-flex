@@ -3,7 +3,7 @@
 """
 @author:TXU
 @file:config_manage.py
-@time:20:03
+@time:2022/11/14
 @email:tao.xu2008@outlook.com
 @description: 
 """
