@@ -7,6 +7,11 @@
 @email:tao.xu2008@outlook.com
 @description:
 """
+from testrunner.core.operator.command.runner import CMDRunner
+
+
+__all__ = ["CMDRunner"]
+
 
 if __name__ == '__main__':
     pass
