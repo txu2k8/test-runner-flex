@@ -17,9 +17,9 @@ from typing import Tuple, Dict, Union, Text, Callable
 from pydantic import ValidationError
 from loguru import logger
 
-from testrunner.utils import exceptions
-from testrunner.core.operator.api import builtin
-from testrunner.core.operator.api.models import ProjectMeta, TCase, TSuite
+from testrunner.core.plugins import exceptions
+from testrunner.core.plugins.api import builtin
+from testrunner.core.plugins.api.models import ProjectMeta, TCase, TSuite
 
 project_meta: Union[ProjectMeta, None] = None
 

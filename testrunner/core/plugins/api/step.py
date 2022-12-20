@@ -12,7 +12,7 @@ from typing import Text, Any, Union
 from loguru import logger
 
 from testrunner.base.models import StepType
-from testrunner.core.operator.api.models import (
+from testrunner.core.plugins.api.models import (
     TConfig,
     TStep,
     TRequest,

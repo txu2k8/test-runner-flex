@@ -26,18 +26,19 @@ except ModuleNotFoundError:
 from loguru import logger
 
 from testrunner.config import global_cf
-from testrunner.utils import exceptions, util
-from testrunner.utils.exceptions import ValidationFailure, StatusCodeValidationFailure, \
+from testrunner.utils import util
+from testrunner.core.plugins import exceptions
+from testrunner.core.plugins.exceptions import ValidationFailure, StatusCodeValidationFailure, \
     ExtractFailure, ParamsError
-from testrunner.core.operator.api.client import HttpSession
-from testrunner.core.operator.api.ext.uploader import prepare_upload_step
-from testrunner.core.operator.api.builtin_loader import load_project_meta
-from testrunner.core.operator.api.parser import build_url, parse_data, parse_variables_mapping, call_func
-from testrunner.core.operator.api.response import ResponseObject
-from testrunner.core.operator.api.step import Config, ApiStep as Step
-from testrunner.core.operator.api.utils import merge_variables
+from testrunner.core.plugins.api.client import HttpSession
+from testrunner.core.plugins.api.ext.uploader import prepare_upload_step
+from testrunner.core.plugins.api.builtin_loader import load_project_meta
+from testrunner.core.plugins.api.parser import build_url, parse_data, parse_variables_mapping, call_func
+from testrunner.core.plugins.api.response import ResponseObject
+from testrunner.core.plugins.api.step import Config, ApiStep as Step
+from testrunner.core.plugins.api.utils import merge_variables
 from testrunner.base.models import TestTime
-from testrunner.core.operator.api.models import (
+from testrunner.core.plugins.api.models import (
     ProjectMeta,
     TConfig,
     TCase,

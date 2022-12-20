@@ -16,7 +16,7 @@ import string
 from typing import List, Tuple, Text
 from faker import Faker
 
-from testrunner.utils.exceptions import ParamsError
+from testrunner.core.plugins.exceptions import ParamsError
 
 
 faker = Faker(['zh_CN'])

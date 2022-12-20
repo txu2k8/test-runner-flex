@@ -11,7 +11,7 @@ import copy
 import platform
 
 from testrunner import __version__
-from testrunner.core.operator.api.models import VariablesMapping
+from testrunner.core.plugins.api.models import VariablesMapping
 
 
 def get_platform():

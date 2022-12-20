@@ -15,10 +15,11 @@ from typing import Any, Set, Text, Callable, List, Dict
 
 from loguru import logger
 
-from testrunner.utils import exceptions, util
+from testrunner.utils import util
+from testrunner.core.plugins import exceptions
 from testrunner import config
-from testrunner.core.operator.api import builtin_loader
-from testrunner.core.operator.api.models import VariablesMapping, FunctionsMapping
+from testrunner.core.plugins.api import builtin_loader
+from testrunner.core.plugins.api.models import VariablesMapping, FunctionsMapping
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 

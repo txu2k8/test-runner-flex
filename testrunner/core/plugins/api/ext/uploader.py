@@ -13,8 +13,8 @@ from typing import Text, NoReturn
 
 from loguru import logger
 from testrunner.config import BASE_DIR
-from testrunner.core.operator.api.models import TStep, FunctionsMapping
-from testrunner.core.operator.api.parser import parse_variables_mapping
+from testrunner.core.plugins.api.models import TStep, FunctionsMapping
+from testrunner.core.plugins.api.parser import parse_variables_mapping
 
 try:
     import filetype

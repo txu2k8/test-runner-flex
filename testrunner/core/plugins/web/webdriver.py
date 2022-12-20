@@ -19,10 +19,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.service import Service as cService
 from loguru import logger
 
-from testrunner.core.operator.models import Settings
-from testrunner.core.operator.exceptions import NotFindElementError
-from testrunner.core.operator.web.asserts import WebAsserts
-from testrunner.core.operator.web.webdriver_manager_extend import ChromeDriverManager
+from testrunner.core.plugins.models import Settings
+from testrunner.core.plugins.web.exceptions import NotFindElementError
+from testrunner.core.plugins.web.asserts import WebAsserts
+from testrunner.core.plugins.web.webdriver_manager_extend import ChromeDriverManager
 from testrunner.core.data_factory.random_func import get_timestamp
 
 

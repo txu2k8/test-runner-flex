@@ -5,11 +5,12 @@
 @file:__init__.py
 @time:2022/08/21
 @email:tao.xu2008@outlook.com
-@description:
+@description: Web自动化测试
 """
-from testrunner.core.operator.api.runner import ApiRunner
+from testrunner.core.plugins.web.webdriver import WebDriver, WebElement
 
-__all__ = ["ApiRunner"]
+
+__all__ = ["WebDriver", "WebElement"]
 
 
 if __name__ == '__main__':

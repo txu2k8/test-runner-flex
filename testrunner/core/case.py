@@ -7,9 +7,9 @@
 @email:tao.xu2008@outlook.com
 @description: 测试用例模板
 """
-from testrunner.core.operator.web import WebDriver
-from testrunner.core.operator.api import ApiRunner
-from testrunner.core.operator.command import CMDRunner
+from testrunner.core.plugins.web import WebDriver
+from testrunner.core.plugins.api import ApiRunner
+from testrunner.core.plugins.command import CMDRunner
 
 
 class TestCase(WebDriver, ApiRunner, CMDRunner):

@@ -11,8 +11,8 @@ import os
 from loguru import logger
 
 from testrunner.config import TESTCASE_DIR
-from testrunner.core.operator.api.data_loader.xmind_case_loader import XmindCaseLoader
-from testrunner.core.operator.api.data_loader.csv_case_loader import CSVCaseLoader
+from testrunner.core.plugins.api.data_loader.xmind_case_loader import XmindCaseLoader
+from testrunner.core.plugins.api.data_loader.csv_case_loader import CSVCaseLoader
 
 supported_f_type = (
     ".xmind",

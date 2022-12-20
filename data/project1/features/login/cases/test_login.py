@@ -8,7 +8,7 @@
 @description:
 """
 from testrunner.core.runner import FlexRunner, Config
-from data.project1.features.login.steps.api import login
+from data.project1.features.login.steps import api
 
 
 class TestCaseLogin(FlexRunner):
@@ -17,11 +17,14 @@ class TestCaseLogin(FlexRunner):
 
     config = Config().suite_name("demo").base_url("http://httpbin.org/")
     teststeps = [
-        login()
+        api.login()
     ]
 
-    def test_001(self):
-        login()
+    def test_001_api(self):
+        api.login()
+
+    def test_002_web(self):
+        api.login()
 
 
 if __name__ == '__main__':

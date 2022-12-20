@@ -7,7 +7,7 @@
 @email:tao.xu2008@outlook.com
 @description:
 """
-from testrunner.core.operator.api.step import ApiStep, RunRequest
+from testrunner.core.plugins.api.step import ApiStep, RunRequest
 
 __all__ = [
     "ApiStep", "RunRequest"

@@ -26,7 +26,7 @@ from requests.exceptions import (
     RequestException,
 )
 
-from testrunner.core.operator.api.models import RequestData, ResponseData, ReqRespData, SessionData
+from testrunner.core.plugins.api.models import RequestData, ResponseData, ReqRespData, SessionData
 from testrunner.utils.util import lower_dict_keys, omit_long_data
 
 # 禁用InsecureRequestWarning

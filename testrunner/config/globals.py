@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 from loguru import logger
 
-from testrunner.utils.exceptions import EnvNotFound, VariableNotFound
+from testrunner.core.plugins.exceptions import EnvNotFound, VariableNotFound
 from testrunner.config.cf_ini import ConfigIni
 
 
