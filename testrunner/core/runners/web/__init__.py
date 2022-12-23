@@ -5,8 +5,12 @@
 @file:__init__.py
 @time:2022/08/21
 @email:tao.xu2008@outlook.com
-@description:执行器、框架内部核心逻辑
+@description: Web自动化测试
 """
+from testrunner.core.runners.web.webdriver import WebDriver, WebElement
+
+
+__all__ = ["WebDriver", "WebElement"]
 
 
 if __name__ == '__main__':

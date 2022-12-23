@@ -15,7 +15,7 @@ from loguru import logger
 from testrunner import config
 from testrunner.cli.session import TestSession
 from testrunner.utils.util import rm_tree, seconds_to_hms, json_dumps
-from testrunner.core.plugins.api.data_loader import load_testcase
+from testrunner.core.runners.api.data_loader import load_testcase
 
 # from django.conf import settings
 # from applications.base_app.models import TestReport
@@ -64,7 +64,7 @@ def _conf2case(test_conf_path_list, testcase_path):
     :param testcase_path:
     :return:
     """
-    from testrunner.core.plugins.api.maker import main_make
+    from testrunner.core.runners.api.maker import main_make
 
     # - 加载、解析用例数据
     tc_data_list = _load_testcase_data(test_conf_path_list)

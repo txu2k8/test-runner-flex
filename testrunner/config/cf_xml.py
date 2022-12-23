@@ -26,7 +26,7 @@ class ConfigXml(object):
 
     @property
     def project(self):
-        rtn = re.findall(r'data/(.*)/conf', self.xml_path_posix)
+        rtn = re.findall(r'(.*)/conf', self.xml_path_posix)
         if len(rtn) > 0:
             project_name = rtn[0]
         else:
@@ -128,6 +128,6 @@ class ConfigXml(object):
 
 
 if __name__ == '__main__':
-    xtc = ConfigXml(r"D:\workspace\test-platform-flex\tpRunner\data\project1\conf\demo.xml")
+    xtc = ConfigXml(r"D:\workspace\src\test-runner-flex\demo\conf\demo.xml")
     tc = xtc.parse_test_conf()
     print(tc.dict())

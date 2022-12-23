@@ -5,8 +5,11 @@
 @file:__init__.py
 @time:2022/08/21
 @email:tao.xu2008@outlook.com
-@description:执行器、框架内部核心逻辑
+@description:
 """
+from testrunner.core.runners.api.runner import ApiRunner
+
+__all__ = ["ApiRunner"]
 
 
 if __name__ == '__main__':
