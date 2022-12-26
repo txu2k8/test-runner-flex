@@ -13,12 +13,15 @@ import arrow
 import calendar
 import random
 import string
+# import logging
 from typing import List, Tuple, Text
 from faker import Faker
+# from faker import factory
 
 from testrunner.core.runners.exceptions import ParamsError
 
-
+# factory.inREPL = True
+# factory.logger.setLevel(logging.WARNING)
 faker = Faker(['zh_CN'])
 
 

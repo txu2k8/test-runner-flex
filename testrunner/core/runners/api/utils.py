@@ -10,14 +10,14 @@
 import copy
 import platform
 
-from testrunner import __version__
+from testrunner.config import VERSION
 from testrunner.core.runners.api.models import VariablesMapping
 
 
 def get_platform():
     """获取测试平台版本信息"""
     return {
-        "runner_version": __version__,
+        "runner_version": VERSION,
         "python_version": "{} {}".format(
             platform.python_implementation(), platform.python_version()
         ),

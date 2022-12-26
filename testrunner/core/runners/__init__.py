@@ -8,11 +8,11 @@
 @description:
 """
 from testrunner.core.runners.api.step import ApiStep, RunRequest
-from testrunner.core.runners.web import WebDriver, WebElement
+from testrunner.core.runners.web import WebRunner, WebDriver, WebElement
 
 __all__ = [
     "ApiStep", "RunRequest",
-    "WebDriver", "WebElement"
+    "WebRunner", "WebDriver", "WebElement"
 ]
 
 

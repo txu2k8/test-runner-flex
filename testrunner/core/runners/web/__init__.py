@@ -8,9 +8,10 @@
 @description: Web自动化测试
 """
 from testrunner.core.runners.web.webdriver import WebDriver, WebElement
+from testrunner.core.runners.web.runner import WebRunner
 
 
-__all__ = ["WebDriver", "WebElement"]
+__all__ = ["WebRunner", "WebDriver", "WebElement"]
 
 
 if __name__ == '__main__':

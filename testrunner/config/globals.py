@@ -15,6 +15,10 @@ from testrunner.core.runners.exceptions import EnvNotFound, VariableNotFound
 from testrunner.config.cf_ini import ConfigIni
 
 
+# 版本号
+VERSION = "1.0.1 - 2022-12-26"
+AUTHOR = "tao.xu"
+
 # 时间字符串
 TIME_STR = datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")  # 时间字符串
 logger.info(TIME_STR)

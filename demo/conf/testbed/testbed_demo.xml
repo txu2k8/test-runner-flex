@@ -9,8 +9,8 @@
        </nodes>
         <endpoint>http://10.1.2.12:59379</endpoint>
         <web_url>http://127.0.0.1:9000</web_url>
-        <RootUser>minioadmin</RootUser>
-        <RootPass>minioadmin</RootPass>
+        <web_user>minioadmin</web_user>
+        <web_pass>minioadmin</web_pass>
         <params>
             <endpoint_https>False</endpoint_https>
         </params>

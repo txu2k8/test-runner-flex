@@ -13,7 +13,7 @@ import typer
 from loguru import logger
 
 from testrunner import config
-from testrunner.cli.session import TestSession
+from testrunner.global_context import GlobalContext
 from testrunner.utils.util import rm_tree, seconds_to_hms, json_dumps
 from testrunner.core.runners.api.data_loader import load_testcase
 
@@ -78,14 +78,14 @@ def _conf2case(test_conf_path_list, testcase_path):
     return pytest_files_run_set
 
 
-def run_pytest(test_session):
+def run_pytest(context):
     """
     执行pytest
-    :param test_session:
+    :param context:
     :return:
     """
     # 解析pytest 文件
-    test_conf = test_session.test_conf
+    test_conf = context.test_conf
     pytest_files_set = []
     for ts in test_conf.test_set_list:
         for case in ts.case_list:
@@ -115,19 +115,19 @@ def run_pytest(test_session):
     # - 构建pytest 参数
     logger.info("构建pytest 参数...")
     argv = pytest_files_set + [
-        '--log_path={}'.format(test_session.html_report_path),
-        '--log_level={}'.format(test_session.log_level),
+        '--log_path={}'.format(context().html_report_path),
+        '--log_level={}'.format(context.log_level),
         '--db_info={}'.format(json_dumps(db_info)),
         '--project_name={}'.format(test_conf.project),
         '--test_conf_path={}'.format(test_conf.full_path),
-        '--report_id={}'.format(test_session.report_id),
-        '-v', '-s', '--ignore-unknown-dependency',
+        '--report_id={}'.format(context.report_id),
+        '-v', '--ignore-unknown-dependency',  # '-s',
         '-W', 'ignore:Module already imported:pytest.PytestWarning',
-        '--html={}'.format(test_session.html_report_path),
+        '--html={}'.format(context().html_report_path),
         '--self-contained-html',
         # '--capture=sys',
         '--allure-no-capture',  # 取消添加程序中捕获到控制台或者终端的log日志或者print输出到allure测试报告的Test Body中
-        '--alluredir={}'.format(test_session.xml_report_path), '--clean-alluredir',  # 生成allure xml结果
+        '--alluredir={}'.format(context().xml_report_path), '--clean-alluredir',  # 生成allure xml结果
     ]
     # -q test_01.py
     logger.info("pytest 命令：{}\n".format(json.dumps(argv, indent=2)))
@@ -168,30 +168,32 @@ def run_pytest(test_session):
 
 def main(
     project_name: str = typer.Option(
-            ...,
+            "demo",
             "--project",
             "-p",
-            help="项目名称，对应目录：data/{$project}"
+            help="项目名称，对应目录：./{$project}"
         ),
     test_conf_path: str = typer.Option(
-            ...,
+            "./demo/conf/demo.xml",
             "--test_conf_path",
             "-f",
-            help="配置文件路径，对应目录：data/<project>/conf/{$test_conf}",
+            help="配置文件路径，对应目录：./{$project}/conf/{$test_conf}",
         ),
 ):
     """FlexRunner 命令行 CLI"""
-    test_conf_path = os.path.join(config.BASE_DIR, test_conf_path)
+    test_conf_path = os.path.abspath(os.path.join(config.BASE_DIR, test_conf_path))
     logger.info("执行 {}::{}".format(project_name, test_conf_path))
 
-    # - 删除旧的测试构建文件
-    _rm_rotation_files(project_name)
+    # 参数解析
+    GlobalContext.test_conf_path = test_conf_path
+    GlobalContext.get_test_conf()
+    GlobalContext.set_env(GlobalContext.test_conf.testbed.env_list[0])
 
-    # 测试session初始化
-    test_session = TestSession(test_conf_path)
+    # - 删除旧的测试构建文件
+    # _rm_rotation_files(project_name)
 
     # - 执行 pytest
-    return run_pytest(test_session)
+    return run_pytest(GlobalContext)
 
 
 if __name__ == '__main__':

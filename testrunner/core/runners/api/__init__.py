@@ -7,9 +7,9 @@
 @email:tao.xu2008@outlook.com
 @description:
 """
-from testrunner.core.runners.api.runner import ApiRunner
+# from testrunner.core.runners.api.runner import ApiRunner
 
-__all__ = ["ApiRunner"]
+# __all__ = ["ApiRunner"]
 
 
 if __name__ == '__main__':

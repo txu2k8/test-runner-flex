@@ -2,20 +2,19 @@
 # -*- coding:utf-8 -*-
 """
 @author:TXU
-@file:case
-@time:2022/12/20
+@file:interface
+@time:2022/12/26
 @email:tao.xu2008@outlook.com
-@description: 测试用例模板
+@description: runner接口
 """
-from testrunner.core.runners.web import WebDriver
-from testrunner.core.runners.api import ApiRunner
-from testrunner.core.runners.command import CMDRunner
+from abc import ABC, abstractmethod
 
 
-class TestCase(WebDriver, ApiRunner, CMDRunner):
-    """TestCase class"""
+class RunnerInterface(ABC):
+    """定义所有 工作流 需要实现的接口"""
 
-    def start_class(self):
+    @abstractmethod
+    def start_class(self, *args, **kwargs):
         """
         Hook method for setting up class fixture before running tests in the class.
         """
@@ -28,31 +27,36 @@ class TestCase(WebDriver, ApiRunner, CMDRunner):
         pass
 
     @classmethod
+    @abstractmethod
     def setup_class(cls):
         cls().start_class()
 
     @classmethod
+    @abstractmethod
     def teardown_class(cls):
         cls().end_class()
 
+    @abstractmethod
     def start(self):
         """
         Hook method for setting up the test fixture before exercising it.
         """
         pass
 
+    @abstractmethod
     def end(self):
         """
         Hook method for deconstructing the test fixture after testing it.
         """
         pass
 
+    @abstractmethod
     def setup(self):
-        self.images = []
-        self.start()
+        pass
 
+    @abstractmethod
     def teardown(self):
-        self.end()
+        pass
 
 
 if __name__ == '__main__':

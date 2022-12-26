@@ -8,24 +8,28 @@
 @description: 基础数据模型
 """
 from enum import Enum
-from typing import Dict, List, Text, Union
+from typing import Dict, List, Text, Union, Any
 
 from pydantic import BaseModel, HttpUrl
 
 Url = Union[HttpUrl, Text]
 
 
-# 输入参数 - 环境
+# 输入参数 - 环境 （cf_xml.py解析）
 class TestEnv(BaseModel):
     """测试环境配置 - 数据模型"""
-    description: Text = ''
-    node_list: List[Dict[Text, Text]]
-    endpoint: Text
-    endpoint_https: bool = False
+    description: Text = 'DEV环境'
+    node_list: List[Dict[Text, Text]] = []
+    endpoint: Text = ""
+    endpoint_user: Text = ""
+    endpoint_pass: Text = ""
+    params: Dict[Text, Any] = {}
     web_url: Url
+    web_user: Text = ""
+    web_pass: Text = ""
 
 
-# 输入参数 - 测试床
+# 输入参数 - 测试床 （cf_xml.py解析）
 class Testbed(BaseModel):
     """测试床配置 - 数据模型"""
     xml_path: Text  # xml配置文件路径
@@ -34,7 +38,7 @@ class Testbed(BaseModel):
     env_list: List[TestEnv]
 
 
-# 输入参数 - 测试集
+# 输入参数 - 测试集 （cf_xml.py解析）
 class TestSet(BaseModel):
     """测试集配置 - 数据模型"""
     xml_path: Text  # xml配置文件路径
@@ -42,7 +46,7 @@ class TestSet(BaseModel):
     case_list: List[Dict]
 
 
-# 输入参数 - 配置
+# 输入参数 - 配置 （cf_xml.py解析）
 class TestConf(BaseModel):
     """测试执行配置 - 数据模型"""
     project: Text

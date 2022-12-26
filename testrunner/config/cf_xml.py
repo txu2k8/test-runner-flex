@@ -28,7 +28,7 @@ class ConfigXml(object):
     def project(self):
         rtn = re.findall(r'(.*)/conf', self.xml_path_posix)
         if len(rtn) > 0:
-            project_name = rtn[0]
+            project_name = os.path.basename(rtn[0])
         else:
             raise Exception("项目名称解析失败：{}".format(self.xml_path))
         return project_name

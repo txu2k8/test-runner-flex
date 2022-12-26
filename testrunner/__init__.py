@@ -7,15 +7,15 @@
 @email:tao.xu2008@outlook.com
 @description:
 """
-from testrunner.core.runners.models import Settings
+# from testrunner.global_context import GlobalContext
 from testrunner.core.runners.api.step import ApiStep, RunRequest
-from testrunner.core.runners.web import WebDriver, WebElement
+from testrunner.core.runners.web import WebRunner, WebDriver, WebElement
 
 __version__ = '0.0.1'
 __all__ = [
-    "Settings",
+    # "GlobalContext",
     "ApiStep", "RunRequest",
-    "WebDriver", "WebElement",  # WEB UI 测试
+    "WebRunner", "WebDriver", "WebElement",  # WEB UI 测试
 ]
 
 

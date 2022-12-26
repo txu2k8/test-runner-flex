@@ -15,8 +15,8 @@ import pytest
 from py._xmlgen import html
 from loguru import logger
 
+from testrunner.global_context import GlobalContext
 from testrunner.base.models import TestStatusEnum, ReportSummary
-from testrunner.cli.session import TestSession
 from testrunner.libs.mysql_opt import MysqlOperation
 from testrunner.libs.sqlite_opt import Sqlite3Operation
 
@@ -154,8 +154,6 @@ def session_fixture(request):
     log_path = request.config.getoption("--log_path")
     log_level = request.config.getoption("--log_level")
     db_info = json.loads(request.config.getoption("--db_info"))
-    project_name = request.config.getoption("--project_name")
-    test_conf_path = request.config.getoption("--test_conf_path")
     report_id = request.config.getoption("--report_id")
     # 添加测试执行logger
     logger.add(
@@ -196,108 +194,11 @@ def session_fixture(request):
     report_summary.time.start_at = start_at
     report_summary.time.start_at_format = datetime.datetime.utcfromtimestamp(start_at).isoformat()
     report_summary.time.duration = time.time() - start_at
-
-    # 遍历用例
-    if db:
-        logger.info("更新测试结果状态到testcase+teststep表...")
-    for item in request.node.items:
-        testcase_summary = item.instance.get_summary()
-        # 总结果：成功 | 失败
-        report_summary.success = report_summary.success and testcase_summary.success
-        # 用例统计
-        case_info = {
-            'stat': testcase_summary.status,
-            'case_id': testcase_summary.id,
-            'case_name': testcase_summary.name,
-            'case_desc': testcase_summary.description,
-            'step_id': '',
-            'step_name': '',
-            'step_desc': ''
-        }
-        report_summary.testcases_stat.total += 1
-        if testcase_summary.status == TestStatusEnum.PASSED:
-            report_summary.testcases_stat.passed += 1
-        elif testcase_summary.status == TestStatusEnum.FAILED:
-            report_summary.testcases_stat.failed += 1
-            report_summary.testcases_stat.failed_list.append(case_info)
-        elif testcase_summary.status == TestStatusEnum.ERROR:
-            report_summary.testcases_stat.error += 1
-            report_summary.testcases_stat.error_list.append(case_info)
-        elif testcase_summary.status == TestStatusEnum.SKIPPED:
-            report_summary.testcases_stat.skipped += 1
-            report_summary.testcases_stat.skipped_list.append(case_info)
-        else:
-            logger.error("无效的测试结果状态！")
-        # if db:
-        #     data = [(testcase_summary.status.value, testcase_summary.id)]
-        #     if db.__class__.__name__ == 'MysqlOperation':
-        #         db.insert_update_delete('UPDATE api_test_testcase SET result = %s WHERE ID = %s', data)
-        #     else:
-        #         db.insert_update_delete('UPDATE api_test_testcase SET result = ? WHERE ID = ?', data)
-
-        # 步骤统计
-        step_datas = testcase_summary.step_datas
-        for step_data in step_datas:
-            # 步骤测试结果统计
-            step_info = {
-                'stat': step_data.status,
-                'case_id': testcase_summary.id,
-                'case_name': testcase_summary.name,
-                'case_desc': testcase_summary.description,
-                'step_id': step_data.id,
-                'step_name': step_data.name,
-                'step_desc': step_data.description,
-            }
-            report_summary.teststeps_stat.total += 1
-            if step_data.status == TestStatusEnum.PASSED:
-                report_summary.teststeps_stat.passed += 1
-            elif step_data.status == TestStatusEnum.FAILED:
-                report_summary.teststeps_stat.failed += 1
-                report_summary.teststeps_stat.failed_list.append(step_info)
-            elif step_data.status == TestStatusEnum.ERROR:
-                report_summary.teststeps_stat.error += 1
-                report_summary.teststeps_stat.error_list.append(step_info)
-            elif step_data.status == TestStatusEnum.SKIPPED:
-                report_summary.teststeps_stat.skipped += 1
-                report_summary.teststeps_stat.skipped_list.append(step_info)
-            else:
-                logger.error("无效的测试结果状态！")
-            # if db:
-            #     data = [(step_data.status.value, step_data.id)]
-            #     if db.__class__.__name__ == 'MysqlOperation':
-            #         db.insert_update_delete('UPDATE api_test_teststep SET result = %s WHERE ID = %s', data)
-            #     else:
-            #         db.insert_update_delete('UPDATE api_test_teststep SET result = ? WHERE ID = ?', data)
-
-            # 步骤请求接口阻塞统计
-            if step_data.blocker:
-                status_code, method, url, api_id, api_desc, test_type, dept_desc, suite_desc, case_id, case_desc, step_desc = step_data.blocker
-                broken_api = {
-                    "report_id": report_id,
-                    "rc": status_code,
-                    "method": method,
-                    "url": url,
-                    "api_id": api_id,
-                    "api_desc": api_desc,
-                    "test_type": test_type,
-                    "dept_desc": dept_desc,
-                    "suite_desc": suite_desc,
-                    "case_id": case_id,
-                    "case_desc": case_desc,
-                    "step_desc": step_desc,
-                    "is_bug": None,
-                    "description": ""
-                }
-                broken_api_ids = [item['api_id'] for item in report_summary.broken_apis]
-                if api_id not in broken_api_ids:
-                    report_summary.broken_apis.append(broken_api)
-
     report_summary.status = TestStatusEnum.PASSED if report_summary.success else TestStatusEnum.FAILED
 
     # 结果报告路径
-    test_session = TestSession(test_conf_path)
-    report_summary.allure_xml_path = test_session.xml_report_path
-    report_summary.html_report_path = test_session.html_report_path
+    report_summary.allure_xml_path = GlobalContext.xml_report_path
+    report_summary.html_report_path = GlobalContext.html_report_path
     # 插入测试结果到TestReport表
     logger.info("插入测试结果到TestReport表...")
     report = {

@@ -10,6 +10,7 @@
 import os
 import time
 import platform
+import logging
 from selenium.webdriver import Chrome
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from selenium.webdriver.common.by import By
@@ -17,16 +18,19 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.service import Service as cService
+from selenium.webdriver.remote.remote_connection import LOGGER as S_LOGGER
 from loguru import logger
 
-from testrunner.core.runners.models import Settings
+from testrunner.global_context import GlobalContext
 from testrunner.core.runners.web.exceptions import NotFindElementError
-from testrunner.core.runners.web.asserts import WebAsserts
 from testrunner.core.runners.web.webdriver_manager_extend import ChromeDriverManager
 from testrunner.core.data_factory.random_func import get_timestamp
 
 
 __all__ = ["WebDriver", "WebElement"]
+
+
+S_LOGGER.setLevel(logging.WARNING)
 
 
 # 提供8中定位方式，与Selenium保持一致。
@@ -63,8 +67,8 @@ class WebElement(object):
         """
         Find if the element exists.
         """
-        for _ in range(Settings.timeout):
-            elems = Settings.driver.find_elements(by=elem[0], value=elem[1])
+        for _ in range(GlobalContext.timeout):
+            elems = GlobalContext.driver.find_elements(by=elem[0], value=elem[1])
             if len(elems) >= 1:
                 self.find_elem_info = f"Find {len(elems)} element: {elem[0]}={elem[1]} "
                 break
@@ -79,28 +83,28 @@ class WebElement(object):
 
         if self.by == "id_":
             self.__find_element((By.ID, self.value))
-            elem = Settings.driver.find_elements(By.ID, self.value)
+            elem = GlobalContext.driver.find_elements(By.ID, self.value)
         elif self.by == "name":
             self.__find_element((By.NAME, self.value))
-            elem = Settings.driver.find_elements(By.NAME, self.value)
+            elem = GlobalContext.driver.find_elements(By.NAME, self.value)
         elif self.by == "class_name":
             self.__find_element((By.CLASS_NAME, self.value))
-            elem = Settings.driver.find_elements(By.CLASS_NAME, self.value)
+            elem = GlobalContext.driver.find_elements(By.CLASS_NAME, self.value)
         elif self.by == "tag":
             self.__find_element((By.TAG_NAME, self.value))
-            elem = Settings.driver.find_elements(By.TAG_NAME, self.value)
+            elem = GlobalContext.driver.find_elements(By.TAG_NAME, self.value)
         elif self.by == "link_text":
             self.__find_element((By.LINK_TEXT, self.value))
-            elem = Settings.driver.find_elements(By.LINK_TEXT, self.value)
+            elem = GlobalContext.driver.find_elements(By.LINK_TEXT, self.value)
         elif self.by == "partial_link_text":
             self.__find_element((By.PARTIAL_LINK_TEXT, self.value))
-            elem = Settings.driver.find_elements(By.PARTIAL_LINK_TEXT, self.value)
+            elem = GlobalContext.driver.find_elements(By.PARTIAL_LINK_TEXT, self.value)
         elif self.by == "xpath":
             self.__find_element((By.XPATH, self.value))
-            elem = Settings.driver.find_elements(By.XPATH, self.value)
+            elem = GlobalContext.driver.find_elements(By.XPATH, self.value)
         elif self.by == "css":
             self.__find_element((By.CSS_SELECTOR, self.value))
-            elem = Settings.driver.find_elements(By.CSS_SELECTOR, self.value)
+            elem = GlobalContext.driver.find_elements(By.CSS_SELECTOR, self.value)
         else:
             raise NameError(
                 "Please enter the correct targeting elements,'id_/name/class_name/tag/link_text/xpath/css'.")
@@ -119,29 +123,17 @@ class WebElement(object):
         Show the elements of the operation
         :param elem:
         """
-        if (Settings.app_server is not None) and (Settings.app_info is not None):
-            return None
         style_red = 'arguments[0].style.border="2px solid #FF0000"'
         style_blue = 'arguments[0].style.border="2px solid #00FF00"'
         style_null = 'arguments[0].style.border=""'
-        if Settings.debug is True:
-            for _ in range(2):
-                Settings.driver.execute_script(style_red, elem)
-                time.sleep(0.2)
-                Settings.driver.execute_script(style_blue, elem)
-                time.sleep(0.2)
-            Settings.driver.execute_script(style_blue, elem)
-            time.sleep(0.2)
-            Settings.driver.execute_script(style_null, elem)
-        else:
-            for _ in range(2):
-                Settings.driver.execute_script(style_red, elem)
-                time.sleep(0.1)
-                Settings.driver.execute_script(style_blue, elem)
-                time.sleep(0.1)
-            Settings.driver.execute_script(style_blue, elem)
-            time.sleep(0.3)
-            Settings.driver.execute_script(style_null, elem)
+        for _ in range(2):
+            GlobalContext.driver.execute_script(style_red, elem)
+            time.sleep(0.1)
+            GlobalContext.driver.execute_script(style_blue, elem)
+            time.sleep(0.1)
+        GlobalContext.driver.execute_script(style_blue, elem)
+        time.sleep(0.3)
+        GlobalContext.driver.execute_script(style_null, elem)
 
     @property
     def info(self):
@@ -154,7 +146,7 @@ class WebElement(object):
         return self.find_elem_warn
 
 
-class WebDriver(WebAsserts):
+class WebDriver(object):
     """selenium封装，使用例写作更简单"""
 
     def __init__(self):
@@ -235,9 +227,9 @@ class WebDriver(WebAsserts):
             self.visit("https://www.baidu.com")
         """
         logger.info(f"📖 {url}")
-        if isinstance(Settings.driver, SeleniumWebDriver) is False:
-            Settings.driver = Chrome(service=cService(ChromeDriverManager().install()))
-        Settings.driver.get(url)
+        if isinstance(GlobalContext.driver, SeleniumWebDriver) is False:
+            GlobalContext.driver = Chrome(service=cService(ChromeDriverManager().install()))
+        GlobalContext.driver.get(url)
 
     def open(self, url: str) -> None:
         """
@@ -256,7 +248,7 @@ class WebDriver(WebAsserts):
         Usage:
             self.max_window()
         """
-        Settings.driver.maximize_window()
+        GlobalContext.driver.maximize_window()
 
     @staticmethod
     def set_window(wide: int = 0, high: int = 0) -> None:
@@ -266,7 +258,7 @@ class WebDriver(WebAsserts):
         Usage:
             self.set_window(wide,high)
         """
-        Settings.driver.set_window_size(wide, high)
+        GlobalContext.driver.set_window_size(wide, high)
 
     @staticmethod
     def get_windows() -> dict:
@@ -276,7 +268,7 @@ class WebDriver(WebAsserts):
         :Usage:
             driver.get_windows()
         """
-        return Settings.driver.get_window_size()
+        return GlobalContext.driver.get_window_size()
 
     def type(self, text: str, clear: bool = False, enter: bool = False, index: int = 0, **kwargs) -> None:
         """
@@ -348,7 +340,7 @@ class WebDriver(WebAsserts):
         elem = web_elem.get_elements(index)
         web_elem.show_element(elem)
         logger.info(f"✅ {web_elem.info} -> slow click.")
-        ActionChains(Settings.driver).move_to_element(elem).click(elem).perform()
+        ActionChains(GlobalContext.driver).move_to_element(elem).click(elem).perform()
 
     @staticmethod
     def right_click(index: int = 0, **kwargs) -> None:
@@ -362,7 +354,7 @@ class WebDriver(WebAsserts):
         elem = web_elem.get_elements(index)
         web_elem.show_element(elem)
         logger.info(f"✅ {web_elem.info} -> right click.")
-        ActionChains(Settings.driver).context_click(elem).perform()
+        ActionChains(GlobalContext.driver).context_click(elem).perform()
 
     @staticmethod
     def move_to_element(index: int = 0, **kwargs) -> None:
@@ -376,7 +368,7 @@ class WebDriver(WebAsserts):
         elem = web_elem.get_elements(index)
         web_elem.show_element(elem)
         logger.info(f"✅ {web_elem.info} -> move to element.")
-        ActionChains(Settings.driver).move_to_element(elem).perform()
+        ActionChains(GlobalContext.driver).move_to_element(elem).perform()
 
     @staticmethod
     def click_and_hold(index: int = 0, **kwargs) -> None:
@@ -390,7 +382,7 @@ class WebDriver(WebAsserts):
         elem = web_elem.get_elements(index)
         web_elem.show_element(elem)
         logger.info(f"✅ {web_elem.info} -> click and hold.")
-        ActionChains(Settings.driver).click_and_hold(elem).perform()
+        ActionChains(GlobalContext.driver).click_and_hold(elem).perform()
 
     @staticmethod
     def drag_and_drop_by_offset(index: int = 0, x: int = 0, y: int = 0, **kwargs) -> None:
@@ -406,7 +398,7 @@ class WebDriver(WebAsserts):
         web_elem = WebElement(**kwargs)
         elem = web_elem.get_elements(index)
         web_elem.show_element(elem)
-        action = ActionChains(Settings.driver)
+        action = ActionChains(GlobalContext.driver)
         logger.info(f"✅ {web_elem.info} -> drag and drop by offset.")
         action.drag_and_drop_by_offset(elem, x, y).perform()
 
@@ -422,7 +414,7 @@ class WebDriver(WebAsserts):
         elem = web_elem.get_elements(index)
         web_elem.show_element(elem)
         logger.info(f"✅ {web_elem.info} -> double click.")
-        ActionChains(Settings.driver).double_click(elem).perform()
+        ActionChains(GlobalContext.driver).double_click(elem).perform()
 
     @staticmethod
     def click_text(text: str, index: int = 0) -> None:
@@ -446,9 +438,9 @@ class WebDriver(WebAsserts):
         Usage:
             self.close()
         """
-        if isinstance(Settings.driver, SeleniumWebDriver) is True:
-            Settings.driver.close()
-            Settings.driver = None
+        if isinstance(GlobalContext.driver, SeleniumWebDriver) is True:
+            GlobalContext.driver.close()
+            GlobalContext.driver = None
 
     @staticmethod
     def quit() -> None:
@@ -458,7 +450,7 @@ class WebDriver(WebAsserts):
         Usage:
             self.quit()
         """
-        Settings.driver.quit()
+        GlobalContext.driver.quit()
 
     @staticmethod
     def submit(index: int = 0, **kwargs) -> None:
@@ -483,7 +475,7 @@ class WebDriver(WebAsserts):
             self.refresh()
         """
         logger.info("🔄️ refresh page.")
-        Settings.driver.refresh()
+        GlobalContext.driver.refresh()
 
     @staticmethod
     def execute_script(script: str, *args):
@@ -493,7 +485,7 @@ class WebDriver(WebAsserts):
         Usage:
             self.execute_script("window.scrollTo(200,1000);")
         """
-        return Settings.driver.execute_script(script, *args)
+        return GlobalContext.driver.execute_script(script, *args)
 
     def window_scroll(self, width: int = 0, height: int = 0) -> None:
         """
@@ -570,8 +562,8 @@ class WebDriver(WebAsserts):
         Usage:
             self.get_title()
         """
-        logger.info(f"✅ get title: {Settings.driver.title}.")
-        return Settings.driver.title
+        logger.info(f"✅ get title: {GlobalContext.driver.title}.")
+        return GlobalContext.driver.title
 
     @property
     def get_url(self) -> str:
@@ -581,8 +573,8 @@ class WebDriver(WebAsserts):
         Usage:
             self.get_url()
         """
-        logger.info(f"✅ get current url: {Settings.driver.current_url}.")
-        return Settings.driver.current_url
+        logger.info(f"✅ get current url: {GlobalContext.driver.current_url}.")
+        return GlobalContext.driver.current_url
 
     @property
     def get_alert_text(self) -> str:
@@ -592,8 +584,8 @@ class WebDriver(WebAsserts):
         Usage:
             self.get_alert_text()
         """
-        logger.info(f"✅ alert text: {Settings.driver.switch_to.alert.text}.")
-        return Settings.driver.switch_to.alert.text
+        logger.info(f"✅ alert text: {GlobalContext.driver.switch_to.alert.text}.")
+        return GlobalContext.driver.switch_to.alert.text
 
     @staticmethod
     def wait(secs: int = 10) -> None:
@@ -604,7 +596,7 @@ class WebDriver(WebAsserts):
             self.wait(10)
         """
         logger.info(f"⌛️ implicitly wait: {secs}s.")
-        Settings.driver.implicitly_wait(secs)
+        GlobalContext.driver.implicitly_wait(secs)
 
     @staticmethod
     def accept_alert() -> None:
@@ -615,7 +607,7 @@ class WebDriver(WebAsserts):
             self.accept_alert()
         """
         logger.info("✅ accept alert.")
-        Settings.driver.switch_to.alert.accept()
+        GlobalContext.driver.switch_to.alert.accept()
 
     @staticmethod
     def dismiss_alert() -> None:
@@ -626,7 +618,7 @@ class WebDriver(WebAsserts):
             self.dismiss_alert()
         """
         logger.info("✅ dismiss alert.")
-        Settings.driver.switch_to.alert.dismiss()
+        GlobalContext.driver.switch_to.alert.dismiss()
 
     @staticmethod
     def switch_to_frame(index: int = 0, **kwargs) -> None:
@@ -640,7 +632,7 @@ class WebDriver(WebAsserts):
         elem = web_elem.get_elements(index)
         web_elem.show_element(elem)
         logger.info(f"✅ {web_elem.info} -> switch to frame.")
-        Settings.driver.switch_to.frame(elem)
+        GlobalContext.driver.switch_to.frame(elem)
 
     @staticmethod
     def switch_to_frame_parent() -> None:
@@ -652,7 +644,7 @@ class WebDriver(WebAsserts):
             self.switch_to_frame_parent()
         """
         logger.info("✅ switch to parent frame.")
-        Settings.driver.switch_to.parent_frame()
+        GlobalContext.driver.switch_to.parent_frame()
 
     @staticmethod
     def switch_to_frame_out() -> None:
@@ -664,7 +656,7 @@ class WebDriver(WebAsserts):
             self.switch_to_frame_out()
         """
         logger.info("✅ switch to frame out.")
-        Settings.driver.switch_to.default_content()
+        GlobalContext.driver.switch_to.default_content()
 
     @staticmethod
     def switch_to_window(window: int) -> None:
@@ -678,8 +670,8 @@ class WebDriver(WebAsserts):
             self.switch_to_window(1)
         """
         logger.info(f"✅ switch to the {window} window.")
-        all_handles = Settings.driver.window_handles
-        Settings.driver.switch_to.window(all_handles[window])
+        all_handles = GlobalContext.driver.window_handles
+        GlobalContext.driver.switch_to.window(all_handles[window])
 
     @staticmethod
     def switch_to_new_window(type_hint=None) -> None:
@@ -693,7 +685,7 @@ class WebDriver(WebAsserts):
             self.switch_to_new_window('tab')
         """
         logger.info("✅ switch to new window.")
-        Settings.driver.switch_to.new_window(type_hint=type_hint)
+        GlobalContext.driver.switch_to.new_window(type_hint=type_hint)
 
     def screenshots(self, file_path: str = None) -> None:
         """
@@ -708,12 +700,12 @@ class WebDriver(WebAsserts):
             if os.path.exists(img_dir) is False:
                 os.mkdir(img_dir)
             file_path = os.path.join(img_dir, get_timestamp() + ".png")
-        if Settings.debug is True:
+        if GlobalContext.debug is True:
             logger.info(f"📷️  screenshot -> ({file_path}).")
-            Settings.driver.save_screenshot(file_path)
+            GlobalContext.driver.save_screenshot(file_path)
         else:
             logger.info("📷️  screenshot -> HTML report.")
-            self.images.append(Settings.driver.get_screenshot_as_base64())
+            self.images.append(GlobalContext.driver.get_screenshot_as_base64())
 
     def element_screenshot(self, file_path: str = None, index: int = 0, **kwargs) -> None:
         """
@@ -731,7 +723,7 @@ class WebDriver(WebAsserts):
             if os.path.exists(img_dir) is False:
                 os.mkdir(img_dir)
             file_path = os.path.join(img_dir, get_timestamp() + ".png")
-        if Settings.debug is True:
+        if GlobalContext.debug is True:
             logger.info(f"📷️ element screenshot -> ({file_path}).")
             elem.screenshot(file_path)
         else:
@@ -780,7 +772,7 @@ class WebDriver(WebAsserts):
         Usage:
             self.get_cookies()
         """
-        return Settings.driver.get_cookies()
+        return GlobalContext.driver.get_cookies()
 
     @staticmethod
     def get_cookie(name: str) -> dict:
@@ -789,7 +781,7 @@ class WebDriver(WebAsserts):
         Usage:
             self.get_cookie("name")
         """
-        return Settings.driver.get_cookie(name)
+        return GlobalContext.driver.get_cookie(name)
 
     @staticmethod
     def add_cookie(cookie_dict: dict) -> None:
@@ -799,7 +791,7 @@ class WebDriver(WebAsserts):
             self.add_cookie({'name' : 'foo', 'value' : 'bar'})
         """
         if isinstance(cookie_dict, dict):
-            Settings.driver.add_cookie(cookie_dict)
+            GlobalContext.driver.add_cookie(cookie_dict)
         else:
             raise TypeError("Wrong cookie type.")
 
@@ -817,7 +809,7 @@ class WebDriver(WebAsserts):
         if isinstance(cookie_list, list):
             for cookie in cookie_list:
                 if isinstance(cookie, dict):
-                    Settings.driver.add_cookie(cookie)
+                    GlobalContext.driver.add_cookie(cookie)
                 else:
                     raise TypeError("Wrong cookie type.")
         else:
@@ -830,7 +822,7 @@ class WebDriver(WebAsserts):
         Usage:
             self.delete_cookie('my_cookie')
         """
-        Settings.driver.delete_cookie(name)
+        GlobalContext.driver.delete_cookie(name)
 
     @staticmethod
     def delete_all_cookies() -> None:
@@ -839,7 +831,7 @@ class WebDriver(WebAsserts):
         Usage:
             self.delete_all_cookies()
         """
-        Settings.driver.delete_all_cookies()
+        GlobalContext.driver.delete_all_cookies()
 
     @staticmethod
     def sleep(sec: int) -> None:
@@ -863,11 +855,11 @@ class WebDriver(WebAsserts):
 
         logger.info("👀 check element.")
         js = f'return document.querySelectorAll("{css}")'
-        ret = Settings.driver.execute_script(js)
+        ret = GlobalContext.driver.execute_script(js)
         if len(ret) > 0:
             for i in range(len(ret)):
                 js = f'return document.querySelectorAll("{css}")[{i}].outerHTML;'
-                ret = Settings.driver.execute_script(js)
+                ret = GlobalContext.driver.execute_script(js)
                 logger.info(f"{i} -> {ret}")
         else:
             logger.warning("No elements were found.")
@@ -910,9 +902,9 @@ class WebDriver(WebAsserts):
         Switch to native app.
         """
         logger.info("🔀 switch to native app.")
-        current_context = Settings.driver.current_context
+        current_context = GlobalContext.driver.current_context
         if current_context != "NATIVE_APP":
-            Settings.driver.switch_to.context('NATIVE_APP')
+            GlobalContext.driver.switch_to.context('NATIVE_APP')
 
     @staticmethod
     def switch_to_web(context=None) -> None:
@@ -921,16 +913,16 @@ class WebDriver(WebAsserts):
         Switch to web view.
         """
         logger.info("🔀 switch to webview.")
-        current_context = Settings.driver.current_context
+        current_context = GlobalContext.driver.current_context
         if context is not None:
-            Settings.driver.switch_to.context(context)
+            GlobalContext.driver.switch_to.context(context)
         elif "WEBVIEW" in current_context:
             return
         else:
-            all_context = Settings.driver.contexts
+            all_context = GlobalContext.driver.contexts
             for context in all_context:
                 if "WEBVIEW" in context:
-                    Settings.driver.switch_to.context(context)
+                    GlobalContext.driver.switch_to.context(context)
                     break
             else:
                 raise NameError("No WebView found.")
@@ -942,9 +934,9 @@ class WebDriver(WebAsserts):
         Switch to flutter app.
         """
         logger.info("🔀 switch to flutter.")
-        current_context = Settings.driver.current_context
+        current_context = GlobalContext.driver.current_context
         if current_context != "NATIVE_APP":
-            Settings.driver.switch_to.context('FLUTTER')
+            GlobalContext.driver.switch_to.context('FLUTTER')
 
 
 if __name__ == '__main__':

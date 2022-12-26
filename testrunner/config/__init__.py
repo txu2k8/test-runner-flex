@@ -13,6 +13,7 @@ from testrunner.config.cf_yaml import read_yaml
 from testrunner.config.cf_ini import ConfigIni, read_ini
 
 __all__ = [
+    "VERSION", "AUTHOR",
     # 基本方法
     "read_yaml", "ConfigIni", "ConfigXml",
     # 全局内存变量-读写

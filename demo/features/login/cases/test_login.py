@@ -16,9 +16,9 @@ settings = None
 
 class TestCaseUILogin(object):
 
-    @pytest.mark()
+    # @pytest.mark()
     def test_002_web(self):
-        LoginPage(settings).login()
+        LoginPage().login_success()
 
 
 if __name__ == '__main__':
