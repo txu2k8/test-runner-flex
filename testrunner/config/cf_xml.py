@@ -42,12 +42,13 @@ class ConfigXml(object):
         """
         tree = ElementTree.parse(testbed_xml_path)
         testbed = tree.getroot()
-        desc = testbed.attrib['desc']
-        name = testbed.attrib['name']
+        desc = testbed.attrib['desc'].encode().decode('utf-8')
+        name = testbed.attrib['name'].encode().decode('utf-8')
         env_conf_list = []
         for env in testbed:
             # env
-            env_conf = {}
+            env_desc = env.attrib['desc'].encode().decode('utf-8')
+            env_conf = {"description": env_desc}
             for child in env:
                 # nodes
                 if child.tag == "nodes":
@@ -79,7 +80,7 @@ class ConfigXml(object):
     def parse_test_set(test_set_xml_path):
         tree = ElementTree.parse(test_set_xml_path)
         test_set = tree.getroot()
-        desc = test_set.attrib['desc']
+        desc = test_set.attrib['desc'].encode().decode('utf-8')
         case_conf_list = []
         for case in test_set:
             case_conf_list.append(case.attrib)
@@ -100,7 +101,7 @@ class ConfigXml(object):
         # logger.debug(self.xml_path)
         tree = ElementTree.parse(self.xml_path)
         test_conf = tree.getroot()
-        description = test_conf.attrib['desc']
+        description = test_conf.attrib['desc'].encode().decode('utf-8')
         conf = {}
         testbed = {}
         test_set_list = []

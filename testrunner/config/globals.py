@@ -29,7 +29,7 @@ global_cf_path = os.path.join(BASE_DIR, "testrunner", "config", "global_cf.ini")
 
 # 日志、报告目录路径
 LOG_DIR = os.path.join(BASE_DIR, "log")
-REPORT_DIR = os.path.join(BASE_DIR, 'report')
+REPORT_DIR = os.path.join(BASE_DIR, 'reports')
 
 # 测试用例设计文档目录路径
 DATA_DIR = os.path.join(BASE_DIR, "data")

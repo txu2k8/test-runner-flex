@@ -8,9 +8,11 @@
 @description: 
 """
 import os
+import json
 from loguru import logger
 from threading import local
 
+from testrunner.base.db_init import InitDB
 from testrunner.base.models import TestConf, TestEnv
 from testrunner.config.cf_xml import ConfigXml
 from testrunner.config.globals import TIME_STR, FILE_LOG_LEVEL, MAX_ROTATION, TESTCASE_DIR, LOG_DIR, REPORT_DIR
@@ -84,22 +86,11 @@ class GlobalContext:
                 logger.info("XML配置文件参数解析...")
                 cx = ConfigXml(cls.test_conf_path)
                 cls.test_conf = cx.parse_test_conf()
+                logger.info(json.dumps(cls.test_conf.dict(), indent=2))
             else:
                 logger.info("测试输入参数解析... TODO")  # TODO
                 raise Exception("输入参数解析暂不支持，请输入XML配置文件路径！")
         return cls.test_conf
-
-    def test_db_init(self):
-        """数据库初始化、插入测试session数据到test_report表"""
-        # TODO
-        project_name = self.test_conf.project
-        logger.info(project_name)
-        # db = InitDB()
-        # db.create_table_if_not_exist()
-        # db.insert_init_testreport()
-
-        report_id = 1
-        return report_id
 
     @property
     def testcase_path(self):
@@ -120,6 +111,20 @@ class GlobalContext:
     @property
     def xml_report_path(self):
         return os.path.join(REPORT_DIR, self.test_conf.project, self.zfill_report_id, "xml")
+
+    def _init_db(self):
+        """数据库初始化、插入测试session数据到test_report表"""
+        # TODO
+        db = InitDB()
+        db.create_table_if_not_exist()
+        self.report_id = db.get_last_id()
+        db.insert_init_testreport(self.report_id)
+
+    def init_data(self):
+        """解析配置文件并初始化全局变量"""
+        self.get_test_conf()  # 解析测试配置文件
+        self.set_env(self.test_conf.testbed.env_list[0])  # 环境信息设置为env
+        self._init_db()
 
 
 if __name__ == '__main__':

@@ -18,7 +18,7 @@ Url = Union[HttpUrl, Text]
 # 输入参数 - 环境 （cf_xml.py解析）
 class TestEnv(BaseModel):
     """测试环境配置 - 数据模型"""
-    description: Text = 'DEV环境'
+    description: Text = ''
     node_list: List[Dict[Text, Text]] = []
     endpoint: Text = ""
     endpoint_user: Text = ""
@@ -116,9 +116,9 @@ class ReportSummary(BaseModel):
     time: TestTime = TestTime()
     testcases_stat: TestStat = TestStat()
     teststeps_stat: TestStat = TestStat()
-    log: Text = ''
-    allure_xml_path: Text = ''
-    html_report_path: Text = ''
+    log_path: Text = ''
+    report_allure_path: Text = ''
+    report_html_path: Text = ''
 
 
 # 数据库连接信息
