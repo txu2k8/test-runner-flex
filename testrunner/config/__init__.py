@@ -25,7 +25,7 @@ __all__ = [
     "global_cf",
     "DB_INFO",  # 数据库配置
     "TIME_STR",  # 时间戳
-    "FILE_LOG_LEVEL", "CONSOLE_LOG_LEVEL", "MAX_ROTATION",  # 日志配置
+    "FILE_LOG_LEVEL", "CONSOLE_LOG_LEVEL", "MAX_ROTATION", "MAX_RETENTION",  # 日志配置
 ]
 
 

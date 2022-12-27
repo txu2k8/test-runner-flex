@@ -12,6 +12,7 @@ import json
 import typer
 from loguru import logger
 
+from testrunner.base.log import LogLevelEnum, init_logger
 from testrunner import config
 from testrunner.global_context import GlobalContext
 from testrunner.utils.util import rm_tree, seconds_to_hms, json_dumps
@@ -179,8 +180,10 @@ def main(
             "-f",
             help="配置文件路径，对应目录：./{$project}/conf/{$test_conf}",
         ),
+    loglevel: LogLevelEnum = typer.Option(LogLevelEnum.INFO, help="日志等级"),
 ):
     """FlexRunner 命令行 CLI"""
+    init_logger(prefix='test', loglevel=loglevel)
     test_conf_path = os.path.abspath(os.path.join(config.BASE_DIR, test_conf_path))
     logger.info("执行 {}::{}".format(project_name, test_conf_path))
 

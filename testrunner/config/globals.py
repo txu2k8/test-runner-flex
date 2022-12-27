@@ -8,6 +8,7 @@
 @description:
 """
 import os
+from pathlib import Path
 from datetime import datetime
 from loguru import logger
 
@@ -21,12 +22,10 @@ AUTHOR = "tao.xu"
 
 # 时间字符串
 TIME_STR = datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")  # 时间字符串
-logger.info(TIME_STR)
 
 # 项目root目录
-config_dir = os.path.dirname(__file__)
-global_cf_path = os.path.join(config_dir, "global_cf.ini")
-BASE_DIR = os.path.abspath(os.path.join(config_dir, "../../"))
+BASE_DIR = Path(__file__).resolve().parent.parent.parent if __file__.endswith('py') else os.getcwd()
+global_cf_path = os.path.join(BASE_DIR, "testrunner", "config", "global_cf.ini")
 
 # 日志、报告目录路径
 LOG_DIR = os.path.join(BASE_DIR, "log")
@@ -43,7 +42,9 @@ TESTCASE_DIR = os.path.join(BASE_DIR, "testcase")
 global_cf = ConfigIni(global_cf_path)
 FILE_LOG_LEVEL = global_cf.get_str("LOGGER", "file_level")
 CONSOLE_LOG_LEVEL = global_cf.get_str("LOGGER", "console_level")
-MAX_ROTATION = int(global_cf.get_str("LOGGER", "max_rotation"))
+MAX_ROTATION = global_cf.get_str("LOGGER", "max_rotation")
+MAX_RETENTION = global_cf.get_str("LOGGER", "max_retention")
+
 DB_INFO = {
     "ENGINE": global_cf.get_str("DATABASES", "ENGINE"),
     "NAME": global_cf.get_str("DATABASES", "NAME"),

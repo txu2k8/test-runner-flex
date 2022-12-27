@@ -19,6 +19,7 @@ class InitDB(object):
     def __init__(self):
         self.db = None
         self.connect()
+        self.table_name = "flex_testreport"
 
     def connect(self):
         """连接数据库"""
@@ -41,7 +42,7 @@ class InitDB(object):
         :return:
         """
         sql = '''
-        CREATE TABLE IF NOT EXISTS "api_test_testreport" (
+        CREATE TABLE IF NOT EXISTS "{}" (
           "update_time" datetime,
           "delete_time" datetime,
           "is_delete" bool NOT NULL,
@@ -88,14 +89,14 @@ class InitDB(object):
            ((JSON_VALID("step_error_list") OR "step_error_list" IS NULL)),
            ((JSON_VALID("step_skipped_list") OR "step_skipped_list" IS NULL))
         )
-        '''
+        '''.format(self.table_name)
 
-        logger.info("CREATE TABLE IF NOT EXISTS \"api_test_testreport\" ...")
+        logger.info("CREATE TABLE IF NOT EXISTS \"{}\" ...".format(self.table_name))
         self.db.create_table(sql)
         return True
 
     def insert_init_testreport(self):
-        insert_sql = '''INSERT INTO api_test_testreport values (?, ?, ?, ?, ?, ?)'''
+        insert_sql = '''INSERT INTO {} values (?, ?, ?, ?, ?, ?)'''.format(self.table_name)
         data = [(1, 'Hongten', 'boy', 20, 'guangzhou', '13423****62'),
                 (2, 'Tom', 'boy', 22, 'guangzhou', '15423****63'),
                 (3, 'Jake', 'girl', 18, 'guangzhou', '18823****87'),
