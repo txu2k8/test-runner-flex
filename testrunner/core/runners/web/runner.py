@@ -19,8 +19,7 @@ from testrunner.core.runners.web.exceptions import NotFindElementError
 from testrunner.core.runners.web.webdriver import WebDriver
 
 
-# @six.add_metaclass(MetaClass)
-class WebRunner(TestCase, WebDriver):  # , metaclass=MetaClass
+class WebRunner(TestCase, WebDriver):
     """Web测试执行引擎入口"""
 
     def assertTitle(self, title: str = None, msg: str = None) -> None:
@@ -85,7 +84,7 @@ class WebRunner(TestCase, WebDriver):  # , metaclass=MetaClass
             self.assertEqual(url, GlobalContext.driver.current_url, msg=msg)
 
     def assertInUrl(self, url: str = None, msg: str = None) -> None:
-        """Asserts whether the current URL is in line with expectations."""
+        """断言：当前URL包含指定url字符"""
         if url is None:
             raise AssertionError("The assertion URL cannot be empty.")
 
