@@ -14,19 +14,14 @@ from urllib.parse import unquote
 from loguru import logger
 from selenium.webdriver.common.by import By
 
-from testrunner.base.models import ReportSummary
 from testrunner.global_context import GlobalContext
 from testrunner.core.runners.web.exceptions import NotFindElementError
 from testrunner.core.runners.web.webdriver import WebDriver
 
 
-class WebRunner(TestCase, WebDriver):
+# @six.add_metaclass(MetaClass)
+class WebRunner(TestCase, WebDriver):  # , metaclass=MetaClass
     """Web测试执行引擎入口"""
-
-    # TODO
-    def get_summary(self) -> ReportSummary:
-        """get testcase result summary"""
-        return ReportSummary()
 
     def assertTitle(self, title: str = None, msg: str = None) -> None:
         """
@@ -90,12 +85,7 @@ class WebRunner(TestCase, WebDriver):
             self.assertEqual(url, GlobalContext.driver.current_url, msg=msg)
 
     def assertInUrl(self, url: str = None, msg: str = None) -> None:
-        """
-        Asserts whether the current URL is in line with expectations.
-
-        Usage:
-        self.assertInUrl("url")
-        """
+        """Asserts whether the current URL is in line with expectations."""
         if url is None:
             raise AssertionError("The assertion URL cannot be empty.")
 

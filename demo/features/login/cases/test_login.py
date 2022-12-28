@@ -8,16 +8,17 @@
 @description:
 """
 import pytest
+import allure
 from demo.page_objects.login_page import LoginPage
-from testrunner.config.cf_xml import ConfigXml
-
-settings = None
 
 
+@allure.suite("登录")
 class TestCaseUILogin(object):
 
-    # @pytest.mark()
-    def test_002_web(self):
+    @pytest.mark.P0
+    @allure.tag("P0")
+    def test_login_001(self):
+        """正常登录成功"""
         LoginPage().login_success()
 
 

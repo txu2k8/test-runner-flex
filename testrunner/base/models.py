@@ -108,10 +108,10 @@ class TestTime(BaseModel):
 # 测试报告 - 结果概览
 class ReportSummary(BaseModel):
     """测试报告概要收集"""
-    success: bool = True
-    id: Text = ""
+    id: int = 0
     name: Text = "xxx测试报告"
     description: Text = "xxx测试报告"
+    success: bool = True
     status: TestStatusEnum = TestStatusEnum.UNKNOWN
     time: TestTime = TestTime()
     testcases_stat: TestStat = TestStat()
@@ -119,6 +119,12 @@ class ReportSummary(BaseModel):
     log_path: Text = ''
     report_allure_path: Text = ''
     report_html_path: Text = ''
+    jenkins_job_name: Text = ''
+    jenkins_build_number: int = 0
+    allure_url: Text = ''
+    build_type: Text = 0
+    build_status: Text = 'build-status-static'
+    env_id: int = 0
 
 
 # 数据库连接信息

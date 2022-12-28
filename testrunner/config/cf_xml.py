@@ -7,7 +7,6 @@
 @email:tao.xu2008@outlook.com
 @description: xml配置文件解析
 """
-import json
 import os
 import re
 import pathlib

@@ -10,8 +10,10 @@
 import os
 import json
 import typer
+import subprocess
 from loguru import logger
 
+from testrunner.base.db import TestDB
 from testrunner.base.log import LogLevelEnum, init_logger
 from testrunner import config
 from testrunner.global_context import GlobalContext
@@ -44,12 +46,8 @@ def run_pytest(context):
     # - 构建pytest 参数
     logger.info("构建pytest 参数...")
     argv = pytest_files_set + [
-        '--log_path={}'.format(context().html_report_path),
+        '--log_path={}'.format(context.report_summary.log_path),
         '--log_level={}'.format(context.log_level),
-        '--db_info={}'.format(json_dumps(db_info)),
-        '--project_name={}'.format(test_conf.project),
-        '--test_conf_path={}'.format(test_conf.full_path),
-        '--report_id={}'.format(context.report_id),
         '-v', '-s',
         # '--show-capture=no',  # 不显示捕获日志
         '--ignore-unknown-dependency',
@@ -58,8 +56,8 @@ def run_pytest(context):
         # '--html={}'.format(context().html_report_path),
         # '--self-contained-html',
         # pytest-testreport
-        '--report=_{}_report_{}.html'.format(test_conf.project, context.report_id),
-        '--title=测试报告：{}（ID={}）'.format(test_conf.project, context.report_id),
+        '--report=_{}_report_{}.html'.format(test_conf.project, context.report_summary.id),
+        '--title=测试报告：{}（ID={}）'.format(test_conf.project, context.report_summary.id),
         '--template=2',
         # '--capture=sys',
         '--allure-no-capture',  # 取消添加程序中捕获到控制台或者终端的log日志或者print输出到allure测试报告的Test Body中
@@ -80,26 +78,61 @@ def run_pytest(context):
     # p = subprocess.Popen(['pytest'] + argv)
     # p.wait()
 
-    return
     # - 获取结果并返回
-    reports = TestReport.objects.filter(id=test_session.report_id)
-    if reports.count() == 0:
-        raise Exception("未找到测试报告：{}".format(test_session.report_id))
+    db = TestDB()
+    filter_keys = ["status", "time", "testcases_stat", "teststeps_stat"]
+    report_id = context.report_summary.id
+    reports = db.get_report(report_id, filter_keys)
+    if len(reports) == 0:
+        raise Exception("未找到测试报告：{}".format(report_id))
 
-    report = reports.first()
-    report_id = report.id
+    report_dict = {}
+    for report in reports:
+        for idx, k in enumerate(filter_keys):
+            report_dict[k] = report[idx]
+        break
+    testcases_stat = json.loads(report_dict["testcases_stat"])
+    total = testcases_stat["total"]
+    passed = testcases_stat["passed"]
+    failed = testcases_stat["failed"]
+    error = testcases_stat["error"]
+    skipped = testcases_stat["skipped"]
+    pass_rate = round((passed+skipped)/total if total > 0 else 0, 3)
+
+    time_dict = json.loads(report_dict["time"])
+    duration = time_dict["duration"]
 
     summary = {
-        "status": report.status,
-        "total": report.step_total,
-        "pass": report.step_passed,
-        "failed": report.step_failed,
-        "error": report.step_error,
-        "skipped": report.step_skipped,
-        "pass_rate": "{}%".format(report.step_pass_rate * 100),
-        "duration": seconds_to_hms(report.duration)
+        "status": report_dict["status"],
+        "total": total,
+        "passed": passed,
+        "failed": failed,
+        "error": error,
+        "skipped": skipped,
+        "pass_rate": "{}%".format(pass_rate * 100),
+        "duration": seconds_to_hms(duration,)
     }
+    logger.info("测试结果：\n{}".format(json_dumps(summary)))
     return report_id, summary
+
+
+def generate_allure_report(context):
+    """
+    从测试报告中读取测试结果数据，生成allure报告。
+    服务器运行：通过Jenkins生成allure报告
+    本地运行：allure serve命令立即生成allure报告
+    :param context:
+    :return:
+    """
+    try:
+        logger.info("generate allure report...")
+        # 本地调试
+        allure_serve_cmd = 'D:\\allure-2.20.1\\bin\\allure serve {}'.format(context.report_summary.report_allure_path)
+        logger.info(allure_serve_cmd)
+        subprocess.Popen(allure_serve_cmd, shell=True, close_fds=True)
+        # p.wait()
+    except Exception as e:
+        logger.error(e)
 
 
 def main(
@@ -109,7 +142,7 @@ def main(
             "-f",
             help="配置文件路径，对应目录：./{$project}/conf/{$test_conf}",
         ),
-    loglevel: LogLevelEnum = typer.Option(LogLevelEnum.TRACE, help="日志等级"),
+    loglevel: LogLevelEnum = typer.Option(LogLevelEnum.INFO, help="日志等级"),
 ):
     """FlexRunner 命令行 CLI"""
     init_logger(prefix='test', loglevel=loglevel)
@@ -121,7 +154,14 @@ def main(
     GlobalContext().init_data()
 
     # - 执行 pytest
-    return run_pytest(GlobalContext)
+    try:
+        return run_pytest(GlobalContext)
+    except Exception as e:
+        raise e
+    finally:
+        logger.info("test log: {}".format(GlobalContext.log_path))
+        logger.info("result data: {}".format(GlobalContext.xml_report_path))
+        generate_allure_report(GlobalContext)
 
 
 if __name__ == '__main__':
