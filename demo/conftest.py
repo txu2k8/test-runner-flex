@@ -10,11 +10,11 @@
 import re
 import time
 import datetime
-import json
 import pytest
 from py._xmlgen import html
 from loguru import logger
 
+from testrunner.base.log import AllureLogger
 from testrunner.base.db import TestDB
 from testrunner.global_context import GlobalContext
 from testrunner.base.models import TestStatusEnum, ReportSummary
@@ -99,17 +99,17 @@ def session_fixture(request):
         level=log_level
     )
 
-    logger.info(f"🚩  Start running testcases ...")
+    logger.info(f"📌 Start running testcases ...")
     # 开始时间
     start_at = time.time()
     GlobalContext.report_summary.time.start_at = start_at
     GlobalContext.report_summary.time.start_at_format = datetime.datetime.utcfromtimestamp(start_at).isoformat()
-    logger.info("🚩  setup 前置操作")
+    logger.info("📌 setup 前置操作")
 
     yield
-    logger.info("🚩  teardown 后置操作")
+    logger.info("📌 teardown 后置操作")
 
-    logger.info(f"🚩  Task finished, update test report summary...")
+    logger.info(f"📌 Task finished, update test report summary...")
     # 连接数据库，写入测试结果
     try:
         db = TestDB()
@@ -130,7 +130,7 @@ def session_fixture(request):
 
     # 插入测试结果到TestReport表
     if db:
-        logger.info("🚩  更新测试结果到TestReport表...")
+        logger.info("📌 更新测试结果到TestReport表...")
         update_keys = [
             "success", "status", "time", "testcases_stat", "teststeps_stat",
             "log_path", "report_allure_path", "report_html_path",
@@ -140,7 +140,7 @@ def session_fixture(request):
         db.update_testreport(GlobalContext.report_summary, filter_keys=update_keys)
 
     # 发送测试报告到邮件 TODO
-    logger.info("🚩  发送测试报告到邮件...（TODO）")
+    logger.info("📌 发送测试报告到邮件...（TODO）")
 
 
 if __name__ == '__main__':

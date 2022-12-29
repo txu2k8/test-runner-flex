@@ -84,6 +84,23 @@ class GlobalContext:
         del rc_l.glb_cache
 
     @classmethod
+    def get_global_step_id(cls, start=1):
+        if not hasattr(cls.current_local, "step_id") or cls.current_local.step_id is None:
+            cls.current_local.step_id = start
+        return cls.current_local.step_id
+
+    @classmethod
+    def reset_step_id(cls, start=1):
+        cls.current_local.step_id = start
+
+    @classmethod
+    def count_global_step_id(cls, start=1, step=1):
+        if not hasattr(cls.current_local, "step_id") or cls.current_local.step_id is None:
+            cls.current_local.step_id = start
+        cls.current_local.step_id += step
+
+
+    @classmethod
     def get_time_str(cls):
         return datetime.now().strftime("%Y%m%d%H%M%S")  # 时间字符串
 

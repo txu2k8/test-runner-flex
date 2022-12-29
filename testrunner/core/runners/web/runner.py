@@ -12,8 +12,10 @@ from unittest import TestCase
 from urllib.parse import unquote
 
 from loguru import logger
+from prettytable import PrettyTable
 from selenium.webdriver.common.by import By
 
+from testrunner.base.models import StepType
 from testrunner.global_context import GlobalContext
 from testrunner.core.runners.web.exceptions import NotFindElementError
 from testrunner.core.runners.web.webdriver import WebDriver
@@ -21,9 +23,10 @@ from testrunner.core.runners.web.webdriver import WebDriver
 
 class WebRunner(TestCase, WebDriver):
     """Web测试执行引擎入口"""
+    step_type = StepType.WEB.value  # 约定：指定测试类型，meta_class.py step需要使用
 
     def assertTitle(self, title: str = None, msg: str = None) -> None:
-        """
+        """断言：当前页面title为指定字符串
         Asserts whether the current title is in line with expectations.
 
         Usage:
@@ -43,7 +46,7 @@ class WebRunner(TestCase, WebDriver):
             self.assertEqual(title, GlobalContext.driver.title, msg=msg)
 
     def assertInTitle(self, title: str = None, msg: str = None) -> None:
-        """
+        """断言：当前页面title包含指定字符串
         Asserts whether the current title is in line with expectations.
 
         Usage:
@@ -146,12 +149,7 @@ class WebRunner(TestCase, WebDriver):
             self.assertNotIn(text, elem.text, msg=msg)
 
     def assertAlertText(self, text: str = None, msg: str = None) -> None:
-        """
-        Asserts whether the text of the current page conforms to expectations.
-
-        Usage:
-        self.assertAlertText("text")
-        """
+        """断言：警告提示文本中包含指定字符串"""
         if text is None:
             raise NameError("Alert text cannot be empty.")
 
@@ -211,6 +209,24 @@ class WebRunner(TestCase, WebDriver):
         GlobalContext.timeout = timeout_backups
 
         self.assertFalse(elem, msg=msg)
+
+    def assertInElement(self, index: int = 0, text: str = None, msg: str = None, **kwargs) -> None:
+        """断言element存在且text包含指定字符串"""
+        if text is None:
+            raise AssertionError("The assertion text cannot be empty.")
+
+        logger.info(f"👀 assertInElement -> {text}.")
+        if msg is None:
+            msg = "No element found"
+        elem = None
+        for _ in range(GlobalContext.timeout + 1):
+            try:
+                elem = self.get_element(index=index, **kwargs)
+                break
+            except NotFindElementError:
+                time.sleep(1)
+
+        self.assertIn(text, elem.text, msg=msg)
 
 
 if __name__ == '__main__':

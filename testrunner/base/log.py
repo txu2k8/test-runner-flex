@@ -23,6 +23,9 @@ import sys
 import atexit
 from enum import Enum
 from typing import Text
+import logging
+
+import allure
 from loguru import logger
 
 from testrunner.config import LOG_DIR, FILE_LOG_LEVEL, CONSOLE_LOG_LEVEL, MAX_ROTATION, MAX_RETENTION
@@ -47,6 +50,15 @@ class LogFormatEnum(Text, Enum):
     DETAIL = "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <7}</level> | " \
              "<cyan>P{process}</cyan>:<cyan>T{thread}</cyan>:<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> " \
              "- <level>{message}</level>"
+
+
+class AllureLogger(logging.Handler):
+    def emit(self, record):
+        if logging.DEBUG < record.levelno:  # print to allure only "info" messages
+            msg = record.getMessage()
+            if "🚩" not in msg:  # meta_class -> step已实现
+                with allure.step(msg):  # f'LOG ({record.levelname}): {record.getMessage()}'
+                    pass  # No need for content, since the step context is doing the work.
 
 
 def init_logger(prefix='test', loglevel=None):
@@ -86,7 +98,7 @@ def init_logger(prefix='test', loglevel=None):
     logger.info(LOG_DIR)
     # 初始化日志配置 -- all日志文件
     logger.add(
-        os.path.join(LOG_DIR, '{time}'+'_{prefix}.log'.format(prefix=prefix)),
+        os.path.join(LOG_DIR, '{time}' + '_{prefix}.log'.format(prefix=prefix)),
         rotation=MAX_ROTATION,  # '100 MB',
         retention=MAX_RETENTION,  # '30 days',
         enqueue=True,
@@ -95,6 +107,12 @@ def init_logger(prefix='test', loglevel=None):
         format=file_format,
         backtrace=True,
         diagnose=True
+    )
+
+    # allure 日志
+    logger.add(
+        AllureLogger(),
+        level=console_loglevel, format=LogFormatEnum.SIMPLE
     )
 
     atexit.register(logger.remove)

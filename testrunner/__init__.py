@@ -8,12 +8,14 @@
 @description:
 """
 # from testrunner.global_context import GlobalContext
+from testrunner.core.runners.meta_class import MetaClass, step, dynamic
 from testrunner.core.runners.api.step import ApiStep, RunRequest
 from testrunner.core.runners.web import WebRunner, WebDriver, WebElement
 
 __version__ = '0.0.1'
 __all__ = [
     # "GlobalContext",
+    "MetaClass", "step", "dynamic",  # 元编程，实现批量装饰
     "ApiStep", "RunRequest",
     "WebRunner", "WebDriver", "WebElement",  # WEB UI 测试
 ]

@@ -29,47 +29,12 @@ class AllureStepDecorator(DecorateClass):
     def operate(self, name, fn):
         @functools.wraps(fn)
         def step(*args, **kv):
-            logger.info(f'🔖   {fn.__doc__}')
+            logger.info(f'🚩 {fn.__doc__}')
             with allure.step(title=fn.__doc__):
                 return fn(*args, **kv)
 
         setattr(self.obj, name, step)
 
 
-class mylocker:
-    def __init__(self):
-        print("mylocker.__init__() called.")
-
-    def acquire(self):
-        print("mylocker.acquire() called.")
-
-    def release(self):
-        print("  mylocker.unlock() called.")
-
-
-class Foo(object):
-    def __init__(self):
-        # Enable one or more decorators for each method:
-        AllureStepDecorator(self).decorate()
-
-    def interface1(self):
-        """interface1"""
-        print(" interface1() called.")
-
-    def interface2(self):
-        """interface2"""
-        print(" interface2() called.")
-
-    def _interface3(self):
-        """_interface3"""
-        print("_interface3() called.")
-
-
 if __name__ == '__main__':
-    obj = Foo()
-    obj.interface1()
-    obj.interface2()
-    obj.interface1()
-    obj.interface2()
-    obj._interface3()
-    print(obj.interface1.__name__)
+    pass

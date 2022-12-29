@@ -1,6 +1,8 @@
 <!--<?xml version="1.0" encoding="utf-8"?>-->
 <testset desc="测试集-demo">
-    <case location="features/login/cases/test_login.py"/>
-    <case location="features/object_store/bucket/test_bucket_create.py"/>
+    <case location="features"/>
+<!--    <case location="features/protocol/object_store/bucket/test_bucket_create.py"/>-->
+<!--    <case location="features/login/test_login.py"/>-->
+<!--    <case location="features/object_store/bucket/test_bucket_create.py"/>-->
 <!--    <case location="features/login/cases/test_login.py" exclude="test002"/>-->
 </testset>

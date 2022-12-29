@@ -159,8 +159,8 @@ def main(
     except Exception as e:
         raise e
     finally:
-        logger.info("test log: {}".format(GlobalContext.log_path))
-        logger.info("result data: {}".format(GlobalContext.xml_report_path))
+        logger.info("test log: {}".format(GlobalContext.report_summary.log_path))
+        logger.info("result data: {}".format(GlobalContext.report_summary.report_allure_path))
         generate_allure_report(GlobalContext)
 
 

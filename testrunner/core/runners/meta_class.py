@@ -7,23 +7,45 @@
 @email:tao.xu2008@outlook.com
 @description: 利用元类批量给所有继承类增加装饰器
 """
+import re
 import allure
-import six
 import types
 import inspect
 import unittest
 from functools import wraps
 from collections import OrderedDict
 from loguru import logger
+from testrunner.global_context import GlobalContext
 
 
 def step(func):
     @wraps(func)
     def wrap(*args, **kwargs):
-        logger.info(f'📌 {func.__doc__}')
-        with allure.step(title=func.__doc__):
+        step_type = args[0].step_type
+        step_desc = func.__doc__.split("\n")[0]
+        step_id = GlobalContext.get_global_step_id()
+        title = f'Step{step_id}：({step_type}){step_desc}'
+        logger.info(f'🚩 {title}')
+        with allure.step(title=title):
+            GlobalContext.count_global_step_id()
             return func(*args, **kwargs)
+    return wrap
 
+
+def dynamic(func):
+    @wraps(func)
+    def wrap(*args, **kwargs):
+        case_desc = func.__doc__
+        case_ids = re.findall(r"-?[0-9]\d*", func.__name__)
+        case_id = case_ids[0] if case_ids else ''
+        case_ids_str = ','.join(case_ids)
+        logger.debug(f'📌 Case：{case_desc}')
+        allure.dynamic.title(f'(ID:{case_ids_str}){case_desc}')
+        allure.dynamic.description(case_desc)
+        allure.dynamic.testcase(f"https://chandao.cn/zendao/testcase-view-{case_id}.html", f"禅道用例: {case_ids_str}")
+        res = func(*args, **kwargs)
+        GlobalContext.reset_step_id()
+        return res
     return wrap
 
 
@@ -36,7 +58,7 @@ class MetaClass(type):
         bases:类所继承的父类
         attrs:类所有的属性
         """
-        cls.func = step  # attrs.get('meta_decoator')
+        cls.func = attrs.get('meta_decoator') or step
         assert inspect.isfunction(cls.func), '传入的meta装饰器不正确'
         # 在类生成的时候做一些手脚
         new_attrs = cls.options(bases, attrs)
@@ -49,7 +71,9 @@ class MetaClass(type):
         for key, value in attrs.items():
             # 对各种类型的方法进行分别处理
             if hasattr(value, '__func__') or isinstance(value, types.FunctionType):
-                if isinstance(value, staticmethod):
+                if key in ('setup', 'teardown', 'setup_class', 'teardown_class'):
+                    continue
+                elif isinstance(value, staticmethod):
                     new_attrs[key] = staticmethod(cls.func(value.__func__))
                 elif isinstance(value, classmethod):
                     new_attrs[key] = classmethod(cls.func(value.__func__))
@@ -67,7 +91,7 @@ class MetaClass(type):
             for key, value in base.__dict__.items():
                 if key not in new_attrs:
                     if hasattr(value, '__func__') or isinstance(value, types.FunctionType):
-                        if key.startswith('addTypeEqualityFunc'):
+                        if key in ('setup', 'teardown', 'setup_class', 'teardown_class'):
                             continue
                         elif isinstance(value, staticmethod):
                             new_attrs[key] = staticmethod(cls.func(value.__func__))
@@ -84,55 +108,5 @@ class MetaClass(type):
         return new_attrs
 
 
-# from unittest import TestCase
-#
-#
-# class obj(TestCase):
-#
-#     def __init__(self):
-#         print('obj.__init__')
-#
-#     def one(self):
-#         """DDDDDDDDDDD"""
-#         print('obj.one')
-#         self.assertFalse(0)
-#
-#
-# # @six.add_metaclass(MetaClass)
-# class obj1(obj, metaclass=MetaClass):
-#     # 只要继承类中有meta_decoator属性,这个属性的方法就会自动装饰下面所有的方法
-#     # 包括类属性,实例属性,property属性,静态属性
-#     # meta_decoator = step
-#     aa = 1
-#
-#     @classmethod
-#     def three(cls):
-#         """步骤描述 3333"""
-#         print('obj1.three')
-#
-#     @staticmethod
-#     def four():
-#         """步骤描述 444444444"""
-#         print('obj1.four')
-#
-#     def two(self):
-#         """步骤描述 22222"""
-#         print(self.pro)
-#         print('obj1.two')
-#         self.one()
-#
-#     @property
-#     def pro(self):
-#         return 1
-#
-#
-# if __name__ == '__main__':
-#     b = obj1()
-#     b.one()
-#     b.two()
-#     b.three()
-#     b.four()
-#
-#     a = obj1
-#     a.four()
-#     a.three()
+if __name__ == '__main__':
+    pass

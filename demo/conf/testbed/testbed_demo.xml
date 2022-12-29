@@ -7,8 +7,8 @@
           <node ip="192.168.50.53" port="22" user="root" password="abc@123" />
           <node ip="192.168.50.54" port="22" user="root" password="abc@123" />
        </nodes>
-        <endpoint>http://10.1.2.12:59379</endpoint>
-        <web_url>http://127.0.0.1:9000</web_url>
+        <endpoint>http://127.0.0.1:9000</endpoint>
+        <web_url>http://127.0.0.1:51677</web_url>
         <web_user>minioadmin</web_user>
         <web_pass>minioadmin</web_pass>
         <params>
